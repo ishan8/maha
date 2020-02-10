@@ -89,7 +89,7 @@ class CSVRowListTest extends BaseOracleQueryGeneratorTest with BaseRowListTest {
   test("successfully construct csv row list with header") {
     val tmpPath = new File("target").toPath
     val tmpFile = Files.createTempFile(tmpPath, "pre", "suf").toFile
-    tmpFile.deleteOnExit()
+//    tmpFile.deleteOnExit()
     val rowListWithHeaders : CSVRowList = new CSVRowList(query, FileRowCSVWriterProvider(tmpFile), true)
     assert(rowListWithHeaders.columnNames === IndexedSeq("Campaign ID", "Impressions", "Campaign Name", "Campaign Status", "CTR", "TOTALROWS"))
     assert(rowListWithHeaders.isEmpty)
@@ -101,15 +101,22 @@ class CSVRowListTest extends BaseOracleQueryGeneratorTest with BaseRowListTest {
 
     assert(rowListWithHeaders.map(row => row).isEmpty, "CSVRowList mapping returns an empty iterable and logs a warning.")
 
-    rowListWithHeaders.withLifeCycle {
+    def addRow(rowList: QueryRowList): Unit = {
       val row = rowListWithHeaders.newRow
-
       row.addValue("Campaign ID", java.lang.Integer.valueOf(1))
       row.addValue("Impressions", java.lang.Integer.valueOf(2))
       row.addValue("Campaign Name", "\"name\"")
       row.addValue("Campaign Status", "o,n")
       row.addValue("CTR", java.lang.Double.valueOf(1.11D))
       row.addValue("TOTALROWS", java.lang.Integer.valueOf(1))
+      rowList.addRow(row)
+    }
+    rowListWithHeaders.withLifeCycle {
+      Range.apply(0, 100000000).foreach {
+        i =>
+          addRow(rowListWithHeaders)
+      }
+/*
       assert(row.getValue("Campaign ID") === 1)
       assert(row.getValue("Impressions") === 2)
       assert(row.getValue("Campaign Name") === "\"name\"")
@@ -126,9 +133,10 @@ class CSVRowListTest extends BaseOracleQueryGeneratorTest with BaseRowListTest {
       assert(row.getValue(5) === 1)
 
       rowListWithHeaders.addRow(row)
+*/
     }
 
-    val csvLines = scala.io.Source.fromFile(tmpFile, "UTF-8").getLines()
+/*    val csvLines = scala.io.Source.fromFile(tmpFile, "UTF-8").getLines()
     var count = 0
     csvLines.foreach {
       line =>
@@ -139,7 +147,7 @@ class CSVRowListTest extends BaseOracleQueryGeneratorTest with BaseRowListTest {
         if(count == 2) {
           assert(line === "1,2,\"\"\"name\"\"\",\"o,n\",1.11,1", line)
         }
-    }
+    }*/
   }
 
   test("successfully construct csv row list without header") {

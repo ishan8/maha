@@ -352,41 +352,31 @@ class JsonRowListTest extends FunSuite with BaseQueryGeneratorTest with SharedDi
   test("successfully construct file json row list") {
     val tmpPath = new File("target").toPath
     val tmpFile = Files.createTempFile(tmpPath, "pre2", "suf2").toFile
-    tmpFile.deleteOnExit()
+    //tmpFile.deleteOnExit()
+
     Files.write(tmpFile.toPath, Array[Byte](1,2,3,4,5), StandardOpenOption.TRUNCATE_EXISTING) // Clear file
     val jsonRowList : QueryRowList = FileJsonRowList.fileJsonRowList(tmpFile, None, false)(query)
     assert(jsonRowList.columnNames === IndexedSeq("Campaign ID", "Impressions", "Campaign Name", "Campaign Status", "CTR", "TOTALROWS"))
     assert(jsonRowList.isEmpty)
-    jsonRowList.withLifeCycle {
-      val row = jsonRowList.newRow
 
+    def addRow(rowList: QueryRowList): Unit = {
+      val row = jsonRowList.newRow
       row.addValue("Campaign ID", java.lang.Integer.valueOf(1))
       row.addValue("Impressions", java.lang.Integer.valueOf(2))
-      row.addValue("Campaign Name", "\"name\"")
-      row.addValue("Campaign Status", "o,n")
+      row.addValue("Campaign Name", "\"CampaignCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign Name NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign Namev\"")
+      row.addValue("Campaign Status", "o,nCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign NameCampaign Name")
       row.addValue("CTR", java.lang.Double.valueOf(1.11D))
       row.addValue("TOTALROWS", java.lang.Integer.valueOf(1))
-      assert(row.getValue("Campaign ID") === 1)
-      assert(row.getValue("Impressions") === 2)
-      assert(row.getValue("Campaign Name") === "\"name\"")
-      assert(row.getValue("Campaign Status") === "o,n")
-      assert(row.getValue("CTR") === 1.11D)
-      assert(row.getValue("TOTALROWS") === 1)
+      rowList.addRow(row)
+    }
 
-      assert(row.aliasMap.size === 6)
-      assert(row.getValue(0) === 1)
-      assert(row.getValue(1) === 2)
-      assert(row.getValue(2) === "\"name\"")
-      assert(row.getValue(3) === "o,n")
-      assert(row.getValue(4) === 1.11D)
-      assert(row.getValue(5) === 1)
-
-      jsonRowList.addRow(row)
-
+    jsonRowList.withLifeCycle {
+      Range.apply(0, 100000000).foreach {
+        i =>
+          addRow(jsonRowList)
+      }
       jsonRowList
     }
-    val jsonString = scala.io.Source.fromFile(tmpFile, "UTF-8").getLines().mkString
-    assert(jsonString === """{"header":{"cube":"k_stats","fields":[{"fieldName":"campaign_id","fieldType":"DIM"},{"fieldName":"Impressions","fieldType":"FACT"},{"fieldName":"Campaign Name","fieldType":"DIM"},{"fieldName":"Campaign Status","fieldType":"DIM"},{"fieldName":"CTR","fieldType":"FACT"},{"fieldName":"TotalRows","fieldType":"CONSTANT"}],"maxRows":100},"rows":[[1,2,"\"name\"","o,n",1.11,1]],"debug":{"fields":[{"fieldName":"Campaign ID","dataType":"Number"},{"fieldName":"Campaign Status","dataType":"String"},{"fieldName":"Impressions","dataType":"Number"},{"fieldName":"Campaign Name","dataType":"String"},{"fieldName":"CTR","dataType":"Number"},{"fieldName":"TOTALROWS","dataType":"Number"},{"fieldName":"TotalRows","dataType":"integer"}],"drivingQuery":{"tableName":"campaign_oracle","engine":"Oracle"}}}""")
   }
   test("fail to construct file json row list with no write perm") {
     val tmpFile= new File("/blah")

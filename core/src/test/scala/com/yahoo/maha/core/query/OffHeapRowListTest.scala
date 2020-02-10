@@ -82,7 +82,7 @@ class OffHeapRowListTest extends BaseRowListTest  {
 
 
   def createRows(rowList: OffHeapRowList): Unit = {
-    Range.apply(100, 200).foreach {
+    Range.apply(100, 2000000).foreach {
       index =>
         val row = rowList.newRow
         row.addValue("Campaign ID", java.lang.Integer.valueOf(index))
@@ -115,9 +115,9 @@ class OffHeapRowListTest extends BaseRowListTest  {
       createRows(rowList)
     }
 
-    assert(rowList.size == 100, "Inconsistent size in rowList")
+    assert(rowList.size == 2000000, "Inconsistent size in rowList")
 
-    assert(rowList.getTotalRowCount == 100, "Inconsistent total row count in rowList")
+    assert(rowList.getTotalRowCount == 2000000, "Inconsistent total row count in rowList")
 
     verifyRowList {
       rowCount =>
@@ -155,11 +155,11 @@ class OffHeapRowListTest extends BaseRowListTest  {
   }
 
   test("Off Heap RowList test, cold start") {
-    val rowList = OffHeapRowList(query, OffHeapRowListConfig(Some("target/"), inMemRowCountThreshold = 200))
+    val rowList = OffHeapRowList(query, OffHeapRowListConfig(Some("target/"), inMemRowCountThreshold = 0))
     genericRowListFunctionalVerification(rowList)
-    assert(rowList.isPersistentStoreInitialized() == false)
-    assert(rowList.sizeOfInMemStore() == 100)
-    assert(rowList.sizeOfRocksDB() == 0 )
+    assert(rowList.isPersistentStoreInitialized() == true)
+    assert(rowList.sizeOfInMemStore() == 0)
+    assert(rowList.sizeOfRocksDB() == 2000000 )
 
     rowList.close()
   }

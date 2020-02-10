@@ -702,7 +702,7 @@ class DruidQueryExecutorTest extends FunSuite with Matchers with BeforeAndAfterA
     val queryPipelineTry = queryPipelineFactoryLocal.from(requestModel.toOption.get, QueryAttributes.empty)
     assert(queryPipelineTry.isSuccess, queryPipelineTry.errorMessage("Fail to get the query pipeline"))
     val query = queryPipelineTry.toOption.get.queryChain.drivingQuery.asInstanceOf[DruidQuery[_]]
-    withDruidQueryExecutor("http://localhost:6667/mock/timeseries"){
+    withDruidQueryExecutor("http://localhost:6667/mock/timeseries") {
       executor =>
         val rowList = new CompleteRowList(query)
         val result = executor.execute(query, rowList, QueryAttributes.empty)
