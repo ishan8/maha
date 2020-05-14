@@ -3068,6 +3068,35 @@ class DruidQueryGeneratorTest extends BaseDruidQueryGeneratorTest {
     assert(result.contains(json))
   }
 
+  test("Successfully generate nested group by query if DruidHyperUniqueTimeBucketedRollup based fact is queried and ensure DruidHyperUniqueRollup works with inner and outer query") {
+    val jsonString = s"""{
+                          "cube": "k_stats",
+                          "selectFields": [
+                            {"field": "Keyword ID"},
+                            {"field": "Keyword Value"},
+                            {"field": "Average Bid"},
+                            {"field": "Unique Ad IDs"},
+                            {"field": "Spend Per Daily Unique"}
+                          ],
+                          "filterExpressions": [
+                            {"field": "Day", "operator": "=", "value": "$fromDate"},
+                            {"field": "Advertiser ID", "operator": "=", "value": "12345"},
+                            {"field": "Ad ID", "operator": "==", "compareTo": "Ad Group ID"}
+                          ],
+                          "paginationStartIndex":20,
+                          "rowsPerPage":100
+                        }"""
+
+    val request: ReportingRequest = getReportingRequestSyncWithAdditionalParameters(jsonString, RequestContext("abc123", "someUser"))
+    val requestModel = RequestModel.from(request, defaultRegistry)
+    val queryPipelineTry = generatePipeline(requestModel.toOption.get)
+    assert(queryPipelineTry.isSuccess, queryPipelineTry.errorMessage("Fail to get the query pipeline"))
+
+    val result =  queryPipelineTry.toOption.get.queryChain.drivingQuery.asInstanceOf[DruidQuery[_]].asString
+    val json = """\{"queryType":"groupBy","dataSource":\{"type":"query","query":\{"queryType":"groupBy","dataSource":\{"type":"table","name":"fact1"\},"intervals":\{"type":"intervals","intervals":\[".*"\]\},"virtualColumns":\[\],"filter":\{"type":"and","fields":\[\{"type":"selector","dimension":"statsDate","value":".*"\},\{"type":"columnComparison","dimensions":\[\{"type":"default","dimension":"ad_id","outputName":"ad_id","outputType":"STRING"\},\{"type":"default","dimension":"ad_group_id","outputName":"ad_group_id","outputType":"STRING"\}\]\},\{"type":"selector","dimension":"advertiser_id","value":"12345"\}\]\},"granularity":\{"type":"all"\},"dimensions":\[\{"type":"default","dimension":"id","outputName":"Keyword ID","outputType":"STRING"\},\{"type":"default","dimension":"__time","outputName":"hyperUniqueTimeBucket","outputType":"STRING"\}\],"aggregations":\[\{"type":"hyperUnique","name":"Unique Ad IDs","fieldName":"ad_id","isInputHyperUnique":false,"round":true\},\{"type":"roundingDoubleSum","name":"_sum_avg_bid","fieldName":"avg_bid","scale":10,"enableRoundingDoubleSumAggregatorFactory":true\},\{"type":"count","name":"_count_avg_bid"\},\{"type":"roundingDoubleSum","name":"spend","fieldName":"spend","scale":10,"enableRoundingDoubleSumAggregatorFactory":true\},\{"type":"hyperUnique","name":"_hyperUniqueOutput_ad_id","fieldName":"ad_id","isInputHyperUnique":false,"round":true\}\],"postAggregations":\[\{"type":"arithmetic","name":"Average Bid","fn":"/","fields":\[\{"type":"fieldAccess","name":"_sum_avg_bid","fieldName":"_sum_avg_bid"\},\{"type":"fieldAccess","name":"_count_avg_bid","fieldName":"_count_avg_bid"\}\]\},\{"type":"hyperUniqueCardinality","name":"daily_unique_ad_ids","fieldName":"_hyperUniqueOutput_ad_id"\},\{"type":"arithmetic","name":"Spend Per Daily Unique","fn":"/","fields":\[\{"type":"fieldAccess","name":"spend","fieldName":"spend"\},\{"type":"fieldAccess","name":"daily_unique_ad_ids","fieldName":"daily_unique_ad_ids"\}\]\}\],"limitSpec":\{"type":"NoopLimitSpec"\},"context":\{"applyLimitPushDown":"false","userId":"someUser","uncoveredIntervalsLimit":1,"groupByIsSingleThreaded":true,"timeout":5000,"queryId":"abc123"\},"descending":false\}\},"intervals":\{"type":"intervals","intervals":\[".*"\]\},"virtualColumns":\[\],"granularity":\{"type":"all"\},"dimensions":\[\{"type":"default","dimension":"Keyword ID","outputName":"Keyword ID","outputType":"STRING"\}\],"aggregations":\[\{"type":"hyperUnique","name":"Unique Ad IDs","fieldName":"Unique Ad IDs","isInputHyperUnique":false,"round":true\},\{"type":"roundingDoubleSum","name":"_sum_avg_bid","fieldName":"_sum_avg_bid","scale":10,"enableRoundingDoubleSumAggregatorFactory":true\},\{"type":"count","name":"_count_avg_bid"\},\{"type":"roundingDoubleSum","name":"spend","fieldName":"spend","scale":10,"enableRoundingDoubleSumAggregatorFactory":true\},\{"type":"longSum","name":"daily_unique_ad_ids","fieldName":"daily_unique_ad_ids"\}\],"postAggregations":\[\{"type":"arithmetic","name":"Average Bid","fn":"/","fields":\[\{"type":"fieldAccess","name":"_sum_avg_bid","fieldName":"_sum_avg_bid"\},\{"type":"fieldAccess","name":"_count_avg_bid","fieldName":"_count_avg_bid"\}\]\},\{"type":"arithmetic","name":"Spend Per Daily Unique","fn":"/","fields":\[\{"type":"fieldAccess","name":"spend","fieldName":"spend"\},\{"type":"fieldAccess","name":"daily_unique_ad_ids","fieldName":"daily_unique_ad_ids"\}\]\}\],"limitSpec":\{"type":"default","columns":\[\],"limit":120\},"context":\{"applyLimitPushDown":"false","userId":"someUser","uncoveredIntervalsLimit":1,"groupByIsSingleThreaded":true,"timeout":5000,"queryId":"abc123"\},"descending":false\}"""
+    result should fullyMatch regex json
+  }
+
   test("Successfully set query priority for async request") {
     val jsonString = s"""{
                           "cube": "k_stats",
@@ -3325,6 +3354,33 @@ class DruidQueryGeneratorTest extends BaseDruidQueryGeneratorTest {
 
     val result = queryPipelineTry.toOption.get.queryChain.drivingQuery.asInstanceOf[DruidQuery[_]].asString
     val json = """\{"queryType":"groupBy","dataSource":\{"type":"table","name":"fact1"\},"intervals":\{"type":"intervals","intervals":\[".*"\]\},"virtualColumns":\[\],"filter":\{"type":"and","fields":\[\{"type":"selector","dimension":"statsDate","value":".*"\},\{"type":"selector","dimension":"advertiser_id","value":"12345"\}\]\},"granularity":\{"type":"all"\},"dimensions":\[\{"type":"extraction","dimension":"__time","outputName":"Week Start","outputType":"STRING","extractionFn":\{"type":"timeFormat","format":"yyyy-MM-dd","timeZone":"UTC","granularity":"WEEK","asMillis":false\}\},\{"type":"default","dimension":"id","outputName":"Keyword ID","outputType":"STRING"\}\],"aggregations":\[\{"type":"longSum","name":"Impressions","fieldName":"impressions"\}\],"postAggregations":\[\],"limitSpec":\{"type":"default","columns":\[\],"limit":120\},"context":\{"applyLimitPushDown":"false","userId":"someUser","uncoveredIntervalsLimit":1,"groupByIsSingleThreaded":true,"timeout":5000,"queryId":"abc123"\},"descending":false\}"""
+    result should fullyMatch regex json
+  }
+
+  test("Successfully generate a filter on an aggregated fact col even when the fact is not in the selected fields") {
+    val jsonString = s"""{
+                      "cube": "k_stats",
+                      "selectFields": [
+                        {"field": "Keyword ID"},
+                        {"field": "Keyword Value"},
+                        {"field": "Clicks"}
+                      ],
+                      "filterExpressions": [
+                        {"field": "Day", "operator": "=", "value": "$fromDate"},
+                        {"field": "Advertiser ID", "operator": "=", "value": "12345"},
+                        {"field": "Impressions", "operator": ">", "value": "5"}
+                      ],
+                      "paginationStartIndex":20,
+                      "rowsPerPage":100
+                    }"""
+
+    val request: ReportingRequest = getReportingRequestSyncWithAdditionalParameters(jsonString, RequestContext("abc123", "someUser"))
+    val requestModel = RequestModel.from(request, defaultRegistry)
+    val queryPipelineTry = generatePipeline(requestModel.toOption.get)
+    assert(queryPipelineTry.isSuccess, queryPipelineTry.errorMessage("Fail to get the query pipeline"))
+    val result = queryPipelineTry.toOption.get.queryChain.drivingQuery.asInstanceOf[DruidQuery[_]].asString
+    println(result)
+    val json = """\{"queryType":"groupBy","dataSource":\{"type":"table","name":"fact1"\},"intervals":\{"type":"intervals","intervals":\[".*"\]\},"virtualColumns":\[\],"filter":\{"type":"and","fields":\[\{"type":"selector","dimension":"statsDate","value":".*"\},\{"type":"selector","dimension":"advertiser_id","value":"12345"\}\]\},"granularity":\{"type":"all"\},"dimensions":\[\{"type":"default","dimension":"id","outputName":"Keyword ID","outputType":"STRING"\}\],"aggregations":\[\{"type":"longSum","name":"Clicks","fieldName":"clicks"\},\{"type":"longSum","name":"Impressions","fieldName":"impressions"\}\],"postAggregations":\[\],"having":\{"type":"and","havingSpecs":\[\{"type":"greaterThan","aggregation":"Impressions","value":5\}\]\},"limitSpec":\{"type":"default","columns":\[\],"limit":120\},"context":\{"applyLimitPushDown":"false","userId":"someUser","uncoveredIntervalsLimit":1,"groupByIsSingleThreaded":true,"timeout":5000,"queryId":"abc123"\},"descending":false\}"""
     result should fullyMatch regex json
   }
 }
