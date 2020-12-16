@@ -2,7 +2,7 @@
 // Licensed under the terms of the Apache License 2.0. Please see LICENSE file in project root for terms.
 package com.yahoo.maha.core.dimension
 
-import com.yahoo.maha.core.{ClassNameHashCode, WithOracleEngine, WithPostgresEngine}
+import com.yahoo.maha.core.{ClassNameHashCode, WithOracleEngine, WithPostgresEngine, WithBigqueryEngine}
 
 /**
  * Created by hiral on 10/2/15.
@@ -22,3 +22,9 @@ case class PostgresPKCompositeIndex(indexName: String) extends DimensionAnnotati
 case object PostgresHashPartitioning extends DimensionAnnotationInstance with WithPostgresEngine
 
 case class DimensionPostgresStaticHint(hint: String) extends DimensionAnnotationInstance with WithPostgresEngine
+
+case class BigqueryPKCompositeIndex(indexName: String) extends DimensionAnnotationInstance with WithBigqueryEngine
+
+case object BigqueryHashPartitioning extends DimensionAnnotationInstance with WithBigqueryEngine
+
+case class DimensionBigqueryStaticHint(hint: String) extends DimensionAnnotationInstance with WithBigqueryEngine
